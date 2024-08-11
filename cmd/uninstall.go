@@ -1,5 +1,5 @@
 /*
- *  cmd/root.go
+ *  cmd/uninstall.go
  *
  *  Copyright (c) 2024 RadianOS Development
  *  Copyright (c) 2024 by Atiksh Sharma <rudy@system-linux.com>
@@ -22,30 +22,14 @@ package cmd
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/spf13/cobra"
 )
 
-var rootCmd = &cobra.Command{
-	Use:   "Iris",
-	Short: "The package manager of RadianOS",
+var removeCmd = &cobra.Command{
+	Use:   "remove",
+	Short: "Removes the application/package",
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("Howdy fellow iris user!. Use --help to see available commands.")
+		fmt.Println("Removing the application.......")
 	},
-}
-
-func Execute() {
-	if err := rootCmd.Execute(); err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
-}
-
-func init() {
-	rootCmd.AddCommand(helpCmd)
-	rootCmd.AddCommand(installCmd)
-	rootCmd.AddCommand(removeCmd)
-	rootCmd.AddCommand(reinstallCmd)
-	rootCmd.AddCommand(resumeCmd)
 }
