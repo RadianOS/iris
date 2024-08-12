@@ -30,6 +30,29 @@ var helpCmd = &cobra.Command{
 	Use:   "help",
 	Short: "Show help information",
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("This is the help command.")
+		help_banner()
+		fmt.Println("Here are the available commands:")
+		listCommands(rootCmd, "")
 	},
+}
+
+func listCommands(cmd *cobra.Command, indent string) {
+
+	fmt.Printf("%s%s\n", indent, cmd.Use)
+	for _, subCmd := range cmd.Commands() {
+		listCommands(subCmd, indent+"  ")
+	}
+}
+
+func help_banner() {
+	banner := `
+ ____  ____   ____ _____     __ __    ___  _      ____
+|    ||    \ |    / ___/    |  |  |  /  _]| |    |    \
+ |  | |  D  ) |  (   \_     |  |  | /  [_ | |    |  o  )
+ |  | |    /  |  |\__  |    |  _  ||    _]| |___ |   _/
+ |  | |    \  |  |/  \ |    |  |  ||   [_ |     ||  |
+ |  | |  .  \ |  |\    |    |  |  ||     ||     ||  |
+|____||__|\_||____|\___|    |__|__||_____||_____||__|
+    `
+	fmt.Println(banner)
 }
