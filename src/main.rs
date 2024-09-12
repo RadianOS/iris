@@ -24,24 +24,38 @@ fn print_version() {
 fn main() {
     let cli = Cli::parse();
 
+    // Handle the version flag
     if cli.version {
         print_version();
         return;
     }
 
+    // Handle the specified operation
     if let Some(operation) = cli.operation {
         match operation {
             Operations::Install(install) => {
                 println!("Installing packages: {:?}", install.pkgs);
+                if install.force {
+                    println!("Force installation enabled.");
+                }
             }
             Operations::Remove(remove) => {
                 println!("Removing packages: {:?}", remove.pkgs);
+                if remove.yes {
+                    println!("Automatic yes to prompts enabled.");
+                }
             }
             Operations::Search(search) => {
                 println!("Searching packages: {:?}", search.terms);
+                if search.all {
+                    println!("Searching all available packages.");
+                }
             }
             Operations::Query(query) => {
                 println!("Querying packages: {:?}", query.terms);
+                if query.details {
+                    println!("Detailed information requested.");
+                }
             }
             Operations::List => {
                 println!("Listing packages");
@@ -54,6 +68,24 @@ fn main() {
             }
             Operations::AddRepo(add_repo) => {
                 println!("Adding repository: {}", add_repo.repo);
+                if add_repo.update {
+                    println!("Updating repository list.");
+                }
+            }
+            Operations::Downgrade(downgrade) => {
+                println!("Downgrading packages: {:?}", downgrade.pkgs);
+                if let Some(version) = downgrade.version {
+                    println!("Downgrading to version: {}", version);
+                }
+            }
+            Operations::Resume(resume) => {
+                if resume.all {
+                    println!("Resuming all paused operations.");
+                } else if let Some(id) = resume.id {
+                    println!("Resuming operation with ID: {}", id);
+                } else {
+                    println!("Resuming operation");
+                }
             }
         }
     } else {
