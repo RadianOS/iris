@@ -12,7 +12,7 @@ Y8P       Y8P                 -------------------------
                       
 888888d888888.d8888b          Iris v1.0.0
 888888P"  88888K              Copyright (C) 2024-2025 RadianOS Development Team
-888888    888"Y8888b.         Copyright (C) 2024-2025 not getting doxxed
+888888    888"Y8888b.         Copyright (C) 2024-2025 Atiksh Sharma
 888888    888     X88         This program may be freely redistributed under
 888888    888 88888P'          the terms of the GNU General Public License.
 "#;
