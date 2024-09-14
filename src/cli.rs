@@ -6,13 +6,11 @@ use clap::{Parser, Subcommand};
     version = "1.0",
     about = "The Iris Package Manager",
     long_about = None,
-    disable_version_flag = true // Disable default version flag
+    disable_version_flag = true
 )]
 pub struct Cli {
     #[command(subcommand)]
     pub operation: Option<Operations>,
-
-    // Define a custom version flag
     #[arg(short = 'V', long = "version", help = "Print version information")]
     pub version: bool,
 }
