@@ -6,13 +6,11 @@ use clap::{Parser, Subcommand};
     version = "1.0",
     about = "The Iris Package Manager",
     long_about = None,
-    disable_version_flag = true // Disable default version flag
+    disable_version_flag = true
 )]
 pub struct Cli {
     #[command(subcommand)]
     pub operation: Option<Operations>,
-
-    // Define a custom version flag
     #[arg(short = 'V', long = "version", help = "Print version information")]
     pub version: bool,
 }
@@ -45,8 +43,13 @@ pub struct Remove {
     #[arg(short = 'p', long = "package", help = "Specify package(s) to remove")]
     pub pkgs: Vec<String>,
 
-    #[arg(short = 'y', long = "yes", help = "Automatically answer yes to prompts")]
+    #[arg(short = 'y', long = "yes", help = "Yes")]
     pub yes: bool,
+
+    
+    #[arg(short = 'f', long = "force", help = "Force uninstallation")]
+    pub force: bool,
+
 }
 
 #[derive(Parser, Debug)]
@@ -80,6 +83,11 @@ pub struct AddRepo {
 pub struct Downgrade {
     #[arg(short = 'p', long = "package", help = "Specify package(s) to downgrade")]
     pub pkgs: Vec<String>,
+
+
+    #[arg(short = 'f', long = "force", help = "Force downgrade")]
+    pub force: bool,
+
 
     #[arg(short = 'v', long = "version", help = "Specify version to downgrade to")]
     pub version: Option<String>,
