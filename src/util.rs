@@ -27,7 +27,7 @@ pub fn confirm_prompt(prompt: &str) -> bool {
     }
 }
 
-pub fn cmd_handler(cli: &Cli) {  // Note the use of `&Cli`
+pub fn cmd_handler(cli: &Cli) {
     match &cli.operation {
         Some(Operations::Install(install)) => {
             if !install.force && !confirm_prompt("Are you sure you want to install the packages") {
