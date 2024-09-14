@@ -43,13 +43,11 @@ pub struct Remove {
     #[arg(short = 'p', long = "package", help = "Specify package(s) to remove")]
     pub pkgs: Vec<String>,
 
-    #[arg(short = 'y', long = "yes", help = "Yes")]
-    pub yes: bool,
-
-    
     #[arg(short = 'f', long = "force", help = "Force uninstallation")]
     pub force: bool,
 
+    #[arg(short = 'y', long = "yes", help = "Automatic yes to prompts")]
+    pub yes: bool,
 }
 
 #[derive(Parser, Debug)]
@@ -84,10 +82,8 @@ pub struct Downgrade {
     #[arg(short = 'p', long = "package", help = "Specify package(s) to downgrade")]
     pub pkgs: Vec<String>,
 
-
     #[arg(short = 'f', long = "force", help = "Force downgrade")]
     pub force: bool,
-
 
     #[arg(short = 'v', long = "version", help = "Specify version to downgrade to")]
     pub version: Option<String>,
