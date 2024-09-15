@@ -1,10 +1,11 @@
 pub mod cli;
 pub mod log;
-use crate::cli::Cli;
-use crate::cli::Operations;
+pub mod util;
+use crate::cli::{Cli, Operations};
 use colored::Colorize;
 use clap::Parser;
-
+use std::io::{self, Write};
+use util::cmd_handler;
 
 const VERSION_TEXT: &str = r#"
 d8b       d8b                    Iris Package Manager         
@@ -21,28 +22,60 @@ fn print_version() {
     println!("{}", VERSION_TEXT.bright_cyan().bold());
 }
 
+fn confirm_prompt(prompt: &str) -> bool {
+    let mut input = String::new();
+    
+    loop {
+        print!("{} (Y/N): ", prompt);
+        io::stdout().flush().unwrap();
+        io::stdin().read_line(&mut input).unwrap();
+        
+        let mut input = input.trim().to_uppercase();
+        
+        match input.as_str() {
+            "Y" | "YES" => return true,
+            "N" | "NO" => return false,
+            "" => {
+                println!("Please enter 'Y' or 'N'.");
+                input.clear();
+            },
+            _ => {
+                println!("Invalid input. Please enter 'Y' or 'N'.");
+                input.clear();
+            }
+        }
+    }
+}
+
 fn main() {
     let cli = Cli::parse();
 
-    // Handle the version flag
     if cli.version {
         print_version();
         return;
     }
+ cmd_handler(&cli);
 
-    // Handle the specified operation
     if let Some(operation) = cli.operation {
         match operation {
             Operations::Install(install) => {
+                if !install.force && !confirm_prompt("Are you sure you want to install the packages") {
+                    println!("Installation aborted.");
+                    return;
+                }
                 println!("Installing packages: {:?}", install.pkgs);
                 if install.force {
                     println!("Force installation enabled.");
                 }
             }
             Operations::Remove(remove) => {
+                if !remove.force && !remove.yes && !confirm_prompt("Are you sure you want to remove the packages") {
+                    println!("Removal aborted.");
+                    return;
+                }
                 println!("Removing packages: {:?}", remove.pkgs);
-                if remove.yes {
-                    println!("Automatic yes to prompts enabled.");
+                if remove.force {
+                    println!("Force removal enabled.");
                 }
             }
             Operations::Search(search) => {
@@ -61,24 +94,44 @@ fn main() {
                 println!("Listing packages");
             }
             Operations::Upgrade => {
+                if !confirm_prompt("Are you sure you want to upgrade the system packages") {
+                    println!("Upgrade aborted.");
+                    return;
+                }
                 println!("Upgrading system packages");
             }
             Operations::Sync => {
+                if !confirm_prompt("Are you sure you want to sync the repositories") {
+                    println!("Sync aborted.");
+                    return;
+                }
                 println!("Syncing repositories");
             }
             Operations::AddRepo(add_repo) => {
                 println!("Adding repository: {}", add_repo.repo);
                 if add_repo.update {
+                    if !confirm_prompt("Are you sure you want to update the repository list") {
+                        println!("Update aborted.");
+                        return;
+                    }
                     println!("Updating repository list.");
                 }
             }
             Operations::Downgrade(downgrade) => {
+                if !downgrade.force && !confirm_prompt("Are you sure you want to downgrade the packages") {
+                    println!("Downgrade aborted.");
+                    return;
+                }
                 println!("Downgrading packages: {:?}", downgrade.pkgs);
                 if let Some(version) = downgrade.version {
                     println!("Downgrading to version: {}", version);
                 }
             }
             Operations::Resume(resume) => {
+                if !resume.all && resume.id.is_none() && !confirm_prompt("Are you sure you want to resume the operation") {
+                    println!("Resume aborted.");
+                    return;
+                }
                 if resume.all {
                     println!("Resuming all paused operations.");
                 } else if let Some(id) = resume.id {
