@@ -22,7 +22,7 @@ fn print_version() {
     println!("{}", VERSION_TEXT.bright_cyan().bold());
 }
 
-fn ask_for_confirmation(prompt: &str) -> bool {
+fn confirm_prompt(prompt: &str) -> bool {
     let mut input = String::new();
     
     loop {
@@ -59,7 +59,7 @@ fn main() {
     if let Some(operation) = cli.operation {
         match operation {
             Operations::Install(install) => {
-                if !install.force && !ask_for_confirmation("Are you sure you want to install the packages") {
+                if !install.force && !confirm_prompt("Are you sure you want to install the packages") {
                     println!("Installation aborted.");
                     return;
                 }
@@ -69,7 +69,7 @@ fn main() {
                 }
             }
             Operations::Remove(remove) => {
-                if !remove.force && !remove.yes && !ask_for_confirmation("Are you sure you want to remove the packages") {
+                if !remove.force && !remove.yes && !confirm_prompt("Are you sure you want to remove the packages") {
                     println!("Removal aborted.");
                     return;
                 }
@@ -94,14 +94,14 @@ fn main() {
                 println!("Listing packages");
             }
             Operations::Upgrade => {
-                if !ask_for_confirmation("Are you sure you want to upgrade the system packages") {
+                if !confirm_prompt("Are you sure you want to upgrade the system packages") {
                     println!("Upgrade aborted.");
                     return;
                 }
                 println!("Upgrading system packages");
             }
             Operations::Sync => {
-                if !ask_for_confirmation("Are you sure you want to sync the repositories") {
+                if !confirm_prompt("Are you sure you want to sync the repositories") {
                     println!("Sync aborted.");
                     return;
                 }
@@ -110,7 +110,7 @@ fn main() {
             Operations::AddRepo(add_repo) => {
                 println!("Adding repository: {}", add_repo.repo);
                 if add_repo.update {
-                    if !ask_for_confirmation("Are you sure you want to update the repository list") {
+                    if !confirm_prompt("Are you sure you want to update the repository list") {
                         println!("Update aborted.");
                         return;
                     }
@@ -118,7 +118,7 @@ fn main() {
                 }
             }
             Operations::Downgrade(downgrade) => {
-                if !downgrade.force && !ask_for_confirmation("Are you sure you want to downgrade the packages") {
+                if !downgrade.force && !confirm_prompt("Are you sure you want to downgrade the packages") {
                     println!("Downgrade aborted.");
                     return;
                 }
@@ -128,7 +128,7 @@ fn main() {
                 }
             }
             Operations::Resume(resume) => {
-                if !resume.all && resume.id.is_none() && !ask_for_confirmation("Are you sure you want to resume the operation") {
+                if !resume.all && resume.id.is_none() && !confirm_prompt("Are you sure you want to resume the operation") {
                     println!("Resume aborted.");
                     return;
                 }
