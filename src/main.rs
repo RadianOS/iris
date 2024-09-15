@@ -54,7 +54,7 @@ fn main() {
         print_version();
         return;
     }
- cmd_handler(cli);
+ cmd_handler(&cli);
 
     if let Some(operation) = cli.operation {
         match operation {
