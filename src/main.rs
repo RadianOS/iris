@@ -9,6 +9,7 @@ use indicatif::{ProgressBar, ProgressStyle};
 use reqwest::blocking::get;
 use std::fs::File;
 use std::io::{self, Write, Read, Result as IoResult};
+use std::env;
 use tar::Archive;
 use xz2::read::XzDecoder;
 use util::cmd_handler;
@@ -85,7 +86,7 @@ fn install_packages(pkgs: &[String], force: bool) {
             continue;
         }
 
-        if let Err(e) = extract_package(&output_path, "/home/rudy") {
+        if let Err(e) = extract_package(&output_path, env::var("HOME").unwrap().as_str()) {
             eprintln!("Failed to extract {}: {}", pkg, e);
         } else {
             println!("Successfully installed {}", pkg);
