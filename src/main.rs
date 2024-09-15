@@ -1,10 +1,16 @@
 pub mod cli;
 pub mod log;
 pub mod util;
+
 use crate::cli::{Cli, Operations};
 use colored::Colorize;
 use clap::Parser;
-use std::io::{self, Write};
+use indicatif::{ProgressBar, ProgressStyle};
+use reqwest::blocking::get;
+use std::fs::File;
+use std::io::{self, Write, Read, Result as IoResult};
+use tar::Archive;
+use xz2::read::XzDecoder;
 use util::cmd_handler;
 
 const VERSION_TEXT: &str = r#"
@@ -22,7 +28,7 @@ fn print_version() {
     println!("{}", VERSION_TEXT.bright_cyan().bold());
 }
 
-fn confirm_prompt(prompt: &str) -> bool {
+fn confirm(prompt: &str) -> bool {
     let mut input = String::new();
     
     loop {
@@ -35,16 +41,59 @@ fn confirm_prompt(prompt: &str) -> bool {
         match input.as_str() {
             "Y" | "YES" => return true,
             "N" | "NO" => return false,
-            "" => {
-                println!("Please enter 'Y' or 'N'.");
-                input.clear();
-            },
             _ => {
                 println!("Invalid input. Please enter 'Y' or 'N'.");
                 input.clear();
             }
         }
     }
+}
+
+fn download_package(url: &str, output_path: &str) -> Result<(), Box<dyn std::error::Error>> {
+    let response = get(url)?;
+    let mut file = File::create(output_path)?;
+    io::copy(&mut response.take(usize::MAX as u64), &mut file)?;
+    Ok(())
+}
+
+fn extract_package(tar_xz_path: &str, output_dir: &str) -> IoResult<()> {
+    let file = File::open(tar_xz_path)?;
+    let decompressor = XzDecoder::new(file);
+    let mut archive = Archive::new(decompressor);
+    archive.unpack(output_dir)?;
+    Ok(())
+}
+
+fn install_packages(pkgs: &[String], force: bool) {
+    if !force && !confirm("Are you sure you want to install the packages") {
+        println!("Installation aborted.");
+        return;
+    }
+    
+    let total = pkgs.len() as u64;
+    let pb = ProgressBar::new(total);
+    pb.set_style(ProgressStyle::default_bar()
+        .template("{spinner:.green} [{elapsed_precise}] {wide_bar} {pos}/{len} ({eta})").expect("REASON")
+        .progress_chars("#>-"));
+
+    for pkg in pkgs {
+        let url = format!("https://raw.githubusercontent.com/RadianOS/zephpkgs/main/{}", pkg);
+        let output_path = format!("/tmp/{}", pkg);
+
+        if let Err(e) = download_package(&url, &output_path) {
+            eprintln!("Failed to download {}: {}", pkg, e);
+            continue;
+        }
+
+        if let Err(e) = extract_package(&output_path, "/home/rudy") {
+            eprintln!("Failed to extract {}: {}", pkg, e);
+        } else {
+            println!("Successfully installed {}", pkg);
+        }
+
+        pb.inc(1);
+    }
+    pb.finish_with_message("Installation complete");
 }
 
 fn main() {
@@ -54,22 +103,16 @@ fn main() {
         print_version();
         return;
     }
- cmd_handler(&cli);
+
+    cmd_handler(&cli);
 
     if let Some(operation) = cli.operation {
         match operation {
             Operations::Install(install) => {
-                if !install.force && !confirm_prompt("Are you sure you want to install the packages") {
-                    println!("Installation aborted.");
-                    return;
-                }
-                println!("Installing packages: {:?}", install.pkgs);
-                if install.force {
-                    println!("Force installation enabled.");
-                }
+                install_packages(&install.pkgs, install.force);
             }
             Operations::Remove(remove) => {
-                if !remove.force && !remove.yes && !confirm_prompt("Are you sure you want to remove the packages") {
+                if !remove.force && !remove.yes && !confirm("Are you sure you want to remove the packages") {
                     println!("Removal aborted.");
                     return;
                 }
@@ -94,14 +137,14 @@ fn main() {
                 println!("Listing packages");
             }
             Operations::Upgrade => {
-                if !confirm_prompt("Are you sure you want to upgrade the system packages") {
+                if !confirm("Are you sure you want to upgrade the system packages") {
                     println!("Upgrade aborted.");
                     return;
                 }
                 println!("Upgrading system packages");
             }
             Operations::Sync => {
-                if !confirm_prompt("Are you sure you want to sync the repositories") {
+                if !confirm("Are you sure you want to sync the repositories") {
                     println!("Sync aborted.");
                     return;
                 }
@@ -110,7 +153,7 @@ fn main() {
             Operations::AddRepo(add_repo) => {
                 println!("Adding repository: {}", add_repo.repo);
                 if add_repo.update {
-                    if !confirm_prompt("Are you sure you want to update the repository list") {
+                    if !confirm("Are you sure you want to update the repository list") {
                         println!("Update aborted.");
                         return;
                     }
@@ -118,7 +161,7 @@ fn main() {
                 }
             }
             Operations::Downgrade(downgrade) => {
-                if !downgrade.force && !confirm_prompt("Are you sure you want to downgrade the packages") {
+                if !downgrade.force && !confirm("Are you sure you want to downgrade the packages") {
                     println!("Downgrade aborted.");
                     return;
                 }
@@ -128,7 +171,7 @@ fn main() {
                 }
             }
             Operations::Resume(resume) => {
-                if !resume.all && resume.id.is_none() && !confirm_prompt("Are you sure you want to resume the operation") {
+                if !resume.all && resume.id.is_none() && !confirm("Are you sure you want to resume the operation") {
                     println!("Resume aborted.");
                     return;
                 }
