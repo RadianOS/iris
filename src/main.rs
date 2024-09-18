@@ -22,8 +22,8 @@ Y8P       Y8P                 -------------------------
 888888d888888.d8888b          Copyright (C) 2024-2025 RadianOS Development Team
 888888P"  88888K              Copyright (C) 2024-2025 Rainbow Linux Development Team
 888888    888"Y8888b.         Copyright (C) 2024-2025 Atiksh Sharma
-888888    888     X88         Copyright (C) 2024-2025 Kıvılcım İ. Öztürk
-888888    888 88888P'         Copyright (C) 2024-2025 Çıt
+888888    888     X88        
+888888    888 88888P'         
                               
                               This program may be freely redistributed under
                                 the terms of the GNU General Public License.
