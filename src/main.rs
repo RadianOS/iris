@@ -67,7 +67,7 @@ fn main() {
     if let Some(operation) = cli.operation {
         match operation {
             Operations::Install(install) => {
-                install::install_packages(&install.pkgs, install.force);
+                install::install_packages(install.pkgs, install.force);
             }
             Operations::Remove(remove) => {
                 if !remove.force && !remove.yes && !confirm("Are you sure you want to remove the packages") {

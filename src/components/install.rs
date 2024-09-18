@@ -1,13 +1,11 @@
 use std::fs::File;
-
 use std::io::{
-    self,
+    self, 
     Result as IoResult
 };
 use reqwest::blocking::get;
 use tar::Archive;
 use xz2::read::XzDecoder;
-
 use indicatif::{
     ProgressBar, 
     ProgressStyle
@@ -30,19 +28,17 @@ pub fn extract_package(tar_xz_path: &str, output_dir: &str) -> IoResult<()> {
     Ok(())
 }
 
-pub fn install_packages(pkgs: &[String], force: bool) {
-    if !force && !confirm("Are you sure you want to install the packages") {
-        println!("Installation aborted.");
-        return;
-    }
-    
-    let total = pkgs.len() as u64;
-    let pb = ProgressBar::new(total);
-    pb.set_style(ProgressStyle::default_bar()
-        .template("{spinner:.green} [{elapsed_precise}] {wide_bar} {pos}/{len} ({eta})").expect("{}")
-        .progress_chars("#>-"));
-
+pub fn install_packages(pkgs: Vec<String>, _force: bool) {
     for pkg in pkgs {
+        println!("Package: {}", pkg);
+        println!("Total Installed Size: 2.70 MiB\n");
+
+        let proceed = confirm(":: Proceed with installation? ");
+        if !proceed {
+            println!("Installation for {} aborted.", pkg);
+            continue;
+        }
+
         let url = format!("https://raw.githubusercontent.com/RadianOS/zephpkgs/main/{}", pkg);
         let output_path = format!("/tmp/{}", pkg);
 
@@ -51,13 +47,18 @@ pub fn install_packages(pkgs: &[String], force: bool) {
             continue;
         }
 
+        println!("Extracting {}...", pkg);
         if let Err(e) = extract_package(&output_path, "/home/rudy") {
             eprintln!("Failed to extract {}: {}", pkg, e);
         } else {
-            println!("Successfully installed {}", pkg);
+            let pb = ProgressBar::new(1);
+            pb.set_style(ProgressStyle::default_bar()
+                .template("{msg} [{bar}] {percent}%").expect("{}")
+                .progress_chars("##-"));
+            pb.set_message(pkg);
+            pb.inc(1);
+            pb.finish_with_message(" installed");
         }
-
-        pb.inc(1);
     }
-    pb.finish_with_message("Installation complete");
+    println!("All installations complete.");
 }
