@@ -1,9 +1,17 @@
 use std::fs::File;
-use std::io::{self,Result as IoResult};
+
+use std::io::{
+    self,
+    Result as IoResult
+};
 use reqwest::blocking::get;
 use tar::Archive;
 use xz2::read::XzDecoder;
-use indicatif::{ProgressBar, ProgressStyle};
+
+use indicatif::{
+    ProgressBar, 
+    ProgressStyle
+};
 use std::io::Read;
 use crate::confirm;
 

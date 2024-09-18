@@ -4,10 +4,16 @@ pub mod util;
 pub mod components;
 use crate::components::install;
 use crate::util::cmd_handler;
-use crate::cli::{Cli, Operations}; 
+use crate::cli::{
+    Cli, 
+    Operations
+}; 
 use colored::Colorize;
 use clap::Parser;
-use std::io::{self, Write};
+use std::io::{
+    self, 
+    Write
+};
 
 const VERSION_TEXT: &str = r#"
 d8b       d8b                    Iris Package Manager         
