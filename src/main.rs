@@ -20,13 +20,10 @@ d8b       d8b                    Iris Package Manager
 Y8P       Y8P                 -------------------------
                               Iris v1.0.0
 888888d888888.d8888b          Copyright (C) 2024-2025 RadianOS Development Team
-888888P"  88888K              Copyright (C) 2024-2025 Rainbow Linux Development Team
+888888P"  88888K         
 888888    888"Y8888b.         Copyright (C) 2024-2025 Atiksh Sharma
-888888    888     X88        
-888888    888 88888P'         
-                              
-                              This program may be freely redistributed under
-                                the terms of the GNU General Public License.
+888888    888     X88         This program may be freely redistributed under
+888888    888 88888P'           the terms of the GNU General Public License.
 "#;
 
 fn print_version() {
